@@ -180,7 +180,8 @@ WITH most_purchased_items AS (
 		m.product_name,
 		COUNT(s.product_id) AS purchased_count,
 		DENSE_RANK() OVER (
-			PARTITION BY s.customer_id ORDER BY COUNT(s.product_id) DESC
+			PARTITION BY s.customer_id
+				ORDER BY COUNT(s.product_id) DESC
 		) AS rank
 	FROM
 		sales s
@@ -218,13 +219,108 @@ ORDER BY
 
 **#6: Which item was purchased first by the customer after they became a member?**
 
+````sql
+
+WITH items_purchased_after_join_date AS (
+	SELECT
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id,
+		DENSE_RANK() OVER (
+			PARTITION BY m.customer_id 
+				ORDER BY s.order_date
+		) AS rank
+	FROM
+		members m
+		JOIN sales s
+			ON m.customer_id=s.customer_id
+	WHERE 
+		m.join_date < s.order_date
+	GROUP BY
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id
+)
+--- end of cte ---
+
+SELECT
+	i.customer_id,
+	mn.product_name
+FROM
+	items_purchased_after_join_date i
+		JOIN menu mn
+			ON i.product_id=mn.product_id
+WHERE
+	i.rank = 1
+GROUP BY
+	i.customer_id,
+	mn.product_name
+;
+````
+#### Steps:
+- Create a CTE and utilize the `DENSE_RANK` window function to assign ranks to each customer's `s.order_date`.
+- Filter the results to only include orders placed before each customer's `m.join_date`.
+- In the main query, join the CTE with the `menu` table to obtain the `m.product_name`.
+
+#### Answer:
+| customer_id | product_name |
+| --- | --- |
+| A | ramen |
+| B | sushi |
+
+***
+
 **#7: Which item was purchased just before the customer became a member?**
+
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
+
+***
 
 **#8: What is the total items and amount spent for each member before they became a member?**
 
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
+
+***
+
 **#9: If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
+
+***
+
 **#10: In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
 
 ***
 
@@ -234,9 +330,29 @@ ORDER BY
 
 **Recreate the table with customer_id, order_date, product_name, price, and member (Y/N).**
 
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
+
 ***
 
 **Rank All the Things**
 
 **Danny also requires further information about the ```ranking``` of customer products, but he purposely does not need the ranking for non-member purchases so he expects null ```ranking``` values for the records when customers are not yet part of the loyalty program.**
+
+````sql
+
+
+````
+#### Steps:
+
+
+#### Answer:
+
+***
 
