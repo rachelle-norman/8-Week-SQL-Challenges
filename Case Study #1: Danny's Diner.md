@@ -73,7 +73,14 @@ ORDER BY
 
 #### Steps:
 - Use the `COUNT(DISTINCT s.order_date)` function to find the unique visit count for each customer.
-- Aggregate the results by `s.customer_id` column to group the visit count for each customer.
+- Aggregate the results by the `s.customer_id` column to group the visit count for each customer.
+
+#### Answer:
+| customer_id | days_visited |
+| --- | --- |
+| A | 4 |
+| B | 6 |
+| C | 2 |
 
 ***
 
@@ -91,12 +98,15 @@ WITH first_purchase AS (
 		sales s
 	WHERE
 		s.order_date= (
+				--- subquery to find first order date ---
 						SELECT
 							MIN(s.order_date)
 						FROM
 							sales s
-			)		
+			) 		--- end of subquery ---	
 )
+
+--- end of cte ---
 
 SELECT
 	fp.customer_id,
@@ -113,12 +123,98 @@ ORDER BY
 
 ````
 
+#### Steps:
+- Create a CTE to find the first item purchased by each customer using the `s.product_id` column and using a subquery to set the `s.order_date` equal to the first date in the column.
+- Use a `JOIN` clause to combine the new CTE with the `menu` table to match the `m.product_name` column to the `product_id` column in the `first_purchase` CTE.
+- Use the `GROUP BY` clause to aggregate the data by `customer_id` and `product_name`.
+
+#### Answer:
+
+| customer_id | product_name |
+| --- | ---|
+| A | curry |
+| A | sushi |
+| B | curry |
+| C | ramen |
 
 ***
 
 **#4: What is the most purchased item on the menu and how many times was it purchased by all customers?**
 
+````sql
+SELECT 
+	m.product_name,
+	COUNT(s.product_id) AS purchased_count
+FROM
+	sales s
+		JOIN menu m
+			ON s.product_id=m.product_id
+GROUP BY
+	m.product_name
+ORDER BY
+	purchased_count DESC
+LIMIT 1	
+;
+````
+
+#### Steps:
+- Use a `COUNT` function on the `s.product_id` column to find the amount of times each item was purchased.
+- Use a `JOIN` clause to combine the `sales` and `menu` tables to match the `m.product_name` with the `s.product_id` in the final results.
+- Order the results by descending so the item with the highest number is at the top and limit the results to 1 so only that item shows.
+
+#### Answer:
+| product_name | purchased_count |
+| --- | --- |
+| ramen | 8 |
+
+
+***
+
 **#5: Which item was the most popular for each customer?**
+
+````sql
+
+WITH most_purchased_items AS (
+	SELECT
+		s.customer_id,
+		m.product_name,
+		COUNT(s.product_id) AS purchased_count,
+		DENSE_RANK() OVER (
+			PARTITION BY s.customer_id ORDER BY COUNT(s.product_id) DESC
+		) AS rank
+	FROM
+		sales s
+			JOIN menu m
+				ON s.product_id=m.product_id
+	GROUP BY
+		s.customer_id,
+		m.product_name
+)
+--- end of cte ---
+
+SELECT 
+	mpi.customer_id,
+	mpi.product_name,
+	mpi.purchased_count
+FROM
+	most_purchased_items mpi
+WHERE
+	mpi.rank = 1
+GROUP BY
+	mpi.customer_id,
+	mpi.product_name,
+	mpi.purchased_count
+ORDER BY
+	mpi.customer_id
+;
+````
+#### Steps:
+- Create a CTE to find and assign a rank to the most purchased items for each customer using the `DENSE_RANK` window function in conjunction with the `PARTITION BY` clause and the `COUNT(s.product_id)` function and order it by `DESC` to ensure the highest values are ranked at 1.
+- Within the CTE, join the `menu` table with the `sales` table to match the `m.product_name` with the corresponding `s.product_id`.
+- In the main query, select the `customer_id`, `product_name`, and `purchased_count` columns from the CTE and filter the results so only items with the rank of 1 show in the final results.
+
+
+***
 
 **#6: Which item was purchased first by the customer after they became a member?**
 
