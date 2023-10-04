@@ -53,6 +53,10 @@ ORDER BY
 | B | 74 |
 | C | 36 |
 
+- Customer A spent $76.
+- Customer B spent $74.
+- Customer C spent $36.
+
 ***
 
 **#2: How many days has each customer visited the restaurant?**
@@ -81,6 +85,10 @@ ORDER BY
 | A | 4 |
 | B | 6 |
 | C | 2 |
+
+- Customer A visited 4 times.
+- Customer B visited 6 times.
+- Customer C visited 2 times.
 
 ***
 
@@ -137,6 +145,10 @@ ORDER BY
 | B | curry |
 | C | ramen |
 
+- Customer A purchased both curry and sushi for their first order.
+- Customer B's first purchase was curry.
+- Customer C's first purchase was ramen.
+
 ***
 
 **#4: What is the most purchased item on the menu and how many times was it purchased by all customers?**
@@ -167,6 +179,7 @@ LIMIT 1
 | --- | --- |
 | ramen | 8 |
 
+- Ramen is the most purchased item on the menu, being purchased 8 times.
 
 ***
 
@@ -214,7 +227,18 @@ ORDER BY
 - Within the CTE, join the `menu` table with the `sales` table to match the `m.product_name` with the corresponding `s.product_id`.
 - In the main query, select the `customer_id`, `product_name`, and `purchased_count` columns from the CTE and filter the results so only items with the rank of 1 show in the final results.
 
+#### Answer:
+| customer_id | product_name | purchased_count |
+| --- | --- | ---|
+| A | ramen | 3 |
+| B | curry | 2 |
+| B | ramen | 2 |
+| B | sushi | 2 |
+| C | ramen | 3 |
 
+- Customer A and C's favorite item is ramen.
+- Customer B likes every menu item equally.
+  
 ***
 
 **#6: Which item was purchased first by the customer after they became a member?**
@@ -261,8 +285,8 @@ GROUP BY
 ````
 #### Steps:
 - Create a CTE and utilize the `DENSE_RANK` window function to assign ranks to each customer's `s.order_date`.
-- Filter the results to only include orders placed before each customer's `m.join_date`.
-- In the main query, join the CTE with the `menu` table to obtain the `m.product_name`.
+- Filter the results to only include orders placed after each customer's `m.join_date`.
+- In the main query, join the CTE with the `menu` table to obtain the `m.product_name`and filter the results so only the highest ranking date (the earliest date after the `m.join_date`) is included.
 
 #### Answer:
 | customer_id | product_name |
@@ -270,44 +294,170 @@ GROUP BY
 | A | ramen |
 | B | sushi |
 
+- Customer A first purchased ramen after becoming a member.
+- Customer B first purchased sushi after becoming a member.
+
 ***
 
 **#7: Which item was purchased just before the customer became a member?**
 
 ````sql
+WITH items_purchased_before_join_date AS (
+	SELECT
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id,
+		DENSE_RANK() OVER (
+			PARTITION BY m.customer_id 
+				ORDER BY s.order_date DESC
+		) AS rank
+	FROM
+		members m
+		JOIN sales s
+			ON m.customer_id=s.customer_id
+	WHERE 
+		m.join_date > s.order_date
+	GROUP BY
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id
+)
+--- end of cte ---
 
+SELECT
+	i.customer_id,
+	mn.product_name
+FROM
+	items_purchased_before_join_date i
+		JOIN menu mn
+			ON i.product_id=mn.product_id
+WHERE
+	i.rank = 1
+GROUP BY
+	i.customer_id,
+	mn.product_name
+;
 
 ````
 #### Steps:
-
+- Create a CTE and utilize the `DENSE_RANK` window function to assign ranks to each customer's `s.order_date` but order the dates by `DESC` so the latest date is ranked highest.
+- Filter the results to only include orders placed before each customer's `m.join_date`.
+- In the main query, join the CTE with the `menu` table to obtain the `m.product_name` and filter the results so only the highest ranking date (the latest date before the `m.join_date`) is included.
 
 #### Answer:
+
+| customer_id | product_name |
+| --- | --- |
+| A | curry |
+| A | sushi |
+| B | sushi |
+
+- Customer A ordered curry and sushi at the same time on the last order date before becoming a member.
+- Customer B ordered sushi before becoming a member.
 
 ***
 
 **#8: What is the total items and amount spent for each member before they became a member?**
 
 ````sql
+WITH items_purchased_before_join_date AS (
+	SELECT
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id
+	FROM
+		members m
+		JOIN sales s
+			ON m.customer_id=s.customer_id
+	WHERE 
+		m.join_date > s.order_date
+	GROUP BY
+		m.customer_id,
+		m.join_date,
+		s.order_date,
+		s.product_id
+)
+--- end cte ---
+SELECT
+	i.customer_id,
+	COUNT(*) AS total_items,
+	SUM(m.price) AS total_price
+FROM
+	items_purchased_before_join_date i
+		JOIN menu m
+			ON i.product_id=m.product_id
 
+GROUP BY
+	i.customer_id
+ORDER BY
+	i.customer_id
+;
 
 ````
 #### Steps:
-
+- Create a CTE and filter the results to find what items each customer ordered before their `m.join_date`.
+- In the main query, use the `COUNT` function to find the total count of items and then the `SUM` function to find the total price.
+- Join the CTE with the `menu` table as the `m.price` column is only found in the `menu` table and group and order the results by `i.customer_id`.
+- Note: I could also do this without using a CTE but rather than use 2 joins on information from all 3 tables, I'd rather filter the data and then use a `JOIN` on only that relevant data.
 
 #### Answer:
+| customer_id | total_items | total_price |
+| --- | --- | --- |
+| A | 2 | 25 |
+| B | 3 | 40 |
+
+- Customer A spent $25 on 2 items before becoming a member.
+- Customer B spent $40 on 3 items before becoming a member.
 
 ***
 
 **#9: If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
 ````sql
+WITH points_calculator AS (
+	SELECT
+		m.product_id,
+		CASE 
+			WHEN m.product_name LIKE 'sushi' THEN (m.price*10)*2
+			ELSE (m.price*10)
+		END AS points
+	FROM
+		menu m
+)
+--- end of cte ---
 
+SELECT
+	s.customer_id,
+	SUM(p.points) AS total_points
+FROM
+	sales s
+		JOIN points_calculator p
+			ON s.product_id=p.product_id
+GROUP BY
+	s.customer_id
+ORDER BY
+	s.customer_id
+;
 
 ````
 #### Steps:
-
+- Create a CTE calculating how many points each menu item is worth.
+- In the main query, total up the points using the `SUM` function and join the CTE with the `sales` table to pull the data from each customers' sales.
+- Group and order .the results by the `s.customer_id` column.
 
 #### Answer:
+| customer_id | total_points |
+| --- | --- |
+| A | 860 |
+| B | 940 |
+| C | 360 |
+
+- Customer A would have 860 points.
+- Customer B would have 940 points.
+- Customer C would have 360 points.
 
 ***
 
