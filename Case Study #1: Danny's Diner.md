@@ -41,13 +41,48 @@ ORDER BY
 	s.customer_id
 ;
 ````
-####Steps:
-- Use the `JOIN` clause to merge the `sales` table and the `menu` table on the `product_id` columns in both tables.
-- Use the `SUM` function
+#### Steps:
+- Use the `JOIN` clause to merge the `sales` table and the `menu` table on the `product_id` columns in both tables since `s.customer_id` and `m.price` are from the two different tables.
+- Use the `SUM` function on the `m.price` column to calculate the total amount spent per customer.
+- Aggregate the results by the `s.customer_id` and order it by the same column for easier readability.
+
+#### Answer:
+| customer_id | total_spent |
+| ----------- | ----------- |
+| A | 76 |
+| B | 74 |
+| C | 36 |
+
+***
 
 **#2: How many days has each customer visited the restaurant?**
 
+````sql
+
+SELECT
+	s.customer_id,
+	COUNT (DISTINCT s.order_date) AS days_visited
+FROM
+	sales s
+GROUP BY 
+	s.customer_id
+ORDER BY
+	s.customer_id
+;
+````
+
+#### Steps:
+- Use the `COUNT(DISTINCT s.order_date)` function to find the unique visit count for each customer.
+- Aggregate the results by `s.customer_id` column to group the visit count for each customer.
+
+***
+
 **#3: What was the first item from the menu purchased by each customer**
+
+
+
+
+***
 
 **#4: What is the most purchased item on the menu and how many times was it purchased by all customers?**
 
