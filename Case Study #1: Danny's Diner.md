@@ -27,6 +27,24 @@ Danny wants to use his restaurant data to understand visiting patterns, spending
 
 **#1: What is the total amount each customer spent at the restaurant?**
 
+````sql
+SELECT
+	s.customer_id,
+	SUM(m.price) AS total_spent
+FROM
+	sales s
+		JOIN menu m
+			ON s.product_id=m.product_id
+GROUP BY
+	s.customer_id
+ORDER BY
+	s.customer_id
+;
+````
+####Steps:
+- Use the `JOIN` clause to merge the `sales` table and the `menu` table on the `product_id` columns in both tables.
+- Use the `SUM` function
+
 **#2: How many days has each customer visited the restaurant?**
 
 **#3: What was the first item from the menu purchased by each customer**
