@@ -79,7 +79,39 @@ ORDER BY
 
 **#3: What was the first item from the menu purchased by each customer**
 
+````sql
 
+WITH first_purchase AS (
+	
+	SELECT
+		s.customer_id,
+		s.order_date AS first_order_date,
+		s.product_id
+	FROM
+		sales s
+	WHERE
+		s.order_date= (
+						SELECT
+							MIN(s.order_date)
+						FROM
+							sales s
+			)		
+)
+
+SELECT
+	fp.customer_id,
+	m.product_name
+FROM
+	first_purchase fp
+		JOIN menu m
+			ON fp.product_id=m.product_id
+GROUP BY
+	fp.customer_id,
+	m.product_name
+ORDER BY
+	fp.customer_id
+
+````
 
 
 ***
