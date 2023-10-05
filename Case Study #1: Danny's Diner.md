@@ -528,6 +528,9 @@ FROM
 | A | 1270 |
 | B | 840 |
 
+- Customer A has 1270 points total.
+- Customer B has 840 points total.
+
 ***
 
 ## BONUS QUESTIONS
@@ -537,13 +540,51 @@ FROM
 **Recreate the table with customer_id, order_date, product_name, price, and member (Y/N).**
 
 ````sql
-
+SELECT
+	s.customer_id,
+	s.order_date,
+	m.product_name,
+	m.price,
+	CASE
+		WHEN s.order_date < mbr.join_date THEN 'N'
+		WHEN s.order_date >= mbr.join_date THEN 'Y'
+		ELSE 'N'
+	END AS member_status_YN
+FROM
+	sales s
+		LEFT JOIN members mbr
+			ON s.customer_id=mbr.customer_id
+		JOIN menu m
+			ON s.product_id=m.product_id
+ORDER BY
+	s.customer_id,
+	s.order_date
 
 ````
 #### Steps:
-
+- Use a `CASE` function to assign each result a 'Y' or 'N' value to determine if they were a member at the time of the `s.order_date`.
+- Use a `LEFT JOIN` when joining the `member` and `sales` tables together to ensure that all data from the `sales` table is being merged over.
+- Reference the relevant columns from the CTE and join it with the `menu` table to pull the `m.product_name` and `m.price`.
+- Order the results by the `s.customer_id` and `s.order_date` columns for easier readability.
 
 #### Answer:
+| customer_id | order_date | product_name | price | member_status_YN |
+| --- | --- | --- | --- | --- |
+| A | 2021-01-01 | sushi | 10 | N |
+| A | 2021-01-01 | curry | 15 | N |
+| A | 2021-01-07 | curry | 15 | Y |
+| A | 2021-01-10 | ramen | 12 | Y |
+| A | 2021-01-11 | ramen | 12 | Y |
+| A | 2021-01-11 | ramen | 12 | Y |
+| B | 2021-01-01 | curry | 15 | N |
+| B | 2021-01-02 | curry | 15 | N |
+| B | 2021-01-04 | sushi | 10 | N |
+| B | 2021-01-11 | sushi | 10 | Y |
+| B | 2021-01-16 | ramen | 12 | Y |
+| B | 2021-02-01 | ramen | 12 | Y |
+| C | 2021-01-01 | ramen | 12 | N |
+| C | 2021-01-01 | ramen | 12 | N |
+| C | 2021-01-07 | ramen | 12 | N |
 
 ***
 
@@ -552,13 +593,66 @@ FROM
 **Danny also requires further information about the ```ranking``` of customer products, but he purposely does not need the ranking for non-member purchases so he expects null ```ranking``` values for the records when customers are not yet part of the loyalty program.**
 
 ````sql
-
+WITH customer_info AS (
+	SELECT
+		s.customer_id,
+		s.order_date,
+		m.product_name,
+		m.price,
+		CASE
+			WHEN s.order_date < mbr.join_date THEN 'N'
+			WHEN s.order_date >= mbr.join_date THEN 'Y'
+			ELSE 'N'
+		END AS member_status_YN
+	FROM
+		sales s
+			LEFT JOIN members mbr
+				ON s.customer_id=mbr.customer_id
+			JOIN menu m
+				ON s.product_id=m.product_id
+	ORDER BY
+		s.customer_id,
+		s.order_date
+ )
+--- end of cte ---
+		
+SELECT
+	c.customer_id,
+	c.order_date,
+	c.product_name,
+	c.price,
+	c.member_status_YN,
+	CASE
+		WHEN c.member_status_YN = 'N' THEN null 
+		ELSE DENSE_RANK () OVER (
+					PARTITION BY c.customer_id, c.member_status_yn
+					ORDER BY c.order_date
+	) END AS rank
+FROM customer_info c
 
 ````
 #### Steps:
-
+- Create a CTE pulling all relevant customer information and use a `CASE` function to assign each result a 'Y' or 'N' value to determine if they were a member at the time of the `s.order_date`.
+- In the main query, select all of the customer information from the CTE and use the `DENSE_RANK` function with a `PARTITION BY` clause inside of a `CASE` function to conditionally rank the data so that any results where the customer is not a member at the time of the `c.order_date`, the result will be `null` and the results will have a different rank for each `c.customer_id` and each `c.member_status_yn` column.
 
 #### Answer:
+| customer_id | order_date | product_name | price | member_status_YN | rank |
+| --- | --- | --- | --- | --- | --- |
+| A | 2021-01-01 | sushi | 10 | N | null |
+| A | 2021-01-01 | curry | 15 | N | null |
+| A | 2021-01-07 | curry | 15 | Y | 1 |
+| A | 2021-01-10 | ramen | 12 | Y | 2 |
+| A | 2021-01-11 | ramen | 12 | Y | 3 |
+| A | 2021-01-11 | ramen | 12 | Y | 3 |
+| B | 2021-01-01 | curry | 15 | N | null |
+| B | 2021-01-02 | curry | 15 | N | null |
+| B | 2021-01-04 | sushi | 10 | N | null |
+| B | 2021-01-11 | sushi | 10 | Y | 1 |
+| B | 2021-01-16 | ramen | 12 | Y | 2 |
+| B | 2021-02-01 | ramen | 12 | Y | 3 |
+| C | 2021-01-01 | ramen | 12 | N | null |
+| C | 2021-01-01 | ramen | 12 | N | null |
+| C | 2021-01-07 | ramen | 12 | N | null |
 
 ***
 
