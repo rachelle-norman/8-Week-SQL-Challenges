@@ -464,13 +464,69 @@ ORDER BY
 **#10: In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
 
 ````sql
+WITH points_calculator AS (
+		SELECT
+			m.product_id,
+			m.price*10 AS points
+		FROM
+			menu m
+),
+ --- end of cte ---
 
+	first_week_dates AS (
+		SELECT
+			mbr.customer_id,
+			mbr.join_date,
+			CAST(
+				mbr.join_date + INTERVAL '7 days' as date
+				) AS last_day_of_week_one
+		FROM
+			members mbr
+		GROUP BY
+			mbr.customer_id,
+			mbr.join_date
+
+),
+--- end of cte ---
+
+ total_points AS (
+		SELECT
+			fw.customer_id,
+			SUM(CASE 
+				WHEN s.order_date BETWEEN fw.join_date AND fw.last_day_of_week_one THEN p.points*2
+				WHEN s.order_date BETWEEN '2021-01-01' AND '2021-01-31' THEN p.points
+				ELSE 0
+			 END) AS total_points
+		FROM
+			first_week_dates fw
+				JOIN sales s
+					ON fw.customer_id=s.customer_id
+				JOIN points_calculator p
+					ON s.product_id=p.product_id
+		GROUP BY
+			fw.customer_id
+		ORDER BY
+			fw.customer_id
+)
+--- end of cte ---
+
+SELECT
+	t.customer_id,
+	t.total_points
+FROM
+	total_points t;	 
 
 ````
 #### Steps:
-
+- Create a CTE (`points_calculator`) to calculate how many points each item is worth and another CTE (`first_week_dates`) calculating the date values for the first week after joining for each customer, making sure to use the `CAST` function after the `INTERVAL` function so both columns are the same data type.
+- Create a third CTE (`total_points`) to calculate the total points for each customer, giving them the base `points` value if the `s.order_date` is within the month of January but adding a 2x points multiplier if the  `s.order_date` falls into the first week after becoming a member. We are only calculating the points for the month of January so any dates that fall outside of that range are set to 0 so they do not count.
+- Select the calculated totals from the (`total_points`) CTE to get the final results. 
 
 #### Answer:
+| customer_id | total_points |
+| --- | --- |
+| A | 1270 |
+| B | 840 |
 
 ***
 
