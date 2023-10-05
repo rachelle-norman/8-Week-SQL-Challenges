@@ -1,6 +1,6 @@
 # 🍜 Danny's Diner - Case Study #1
 
-<img src="https://github.com/rnorman1996/8-Week-SQL-Challenges/assets/129090943/dfd83f48-d03e-462c-b132-85bf2d867c02.png" alt="Image" width="500" height="520">
+<img src="https://github.com/rachelle-norman/8-Week-SQL-Challenges/assets/129090943/dfd83f48-d03e-462c-b132-85bf2d867c02.png" alt="Image" width="500" height="520">
 
 ## 📚 Table of Contents
 - [Objective](#objective)
@@ -19,7 +19,7 @@ Danny wants to use his restaurant data to understand visiting patterns, spending
 
 ## Entity Relationship Diagram
 
-![image](https://github.com/rnorman1996/8-Week-SQL-Challenges/assets/129090943/2f986529-489e-4b2c-919a-ccc622345392)
+![image](https://github.com/rachelle-norman/8-Week-SQL-Challenges/assets/129090943/2f986529-489e-4b2c-919a-ccc622345392)
 
 ***
 
