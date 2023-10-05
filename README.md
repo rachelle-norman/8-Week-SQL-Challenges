@@ -1,6 +1,6 @@
 # 8-Week-SQL-Challenges
 
-This repo contains the solutions to 8 case studies from the #8WeekSQLChallenge. 
+This repo contains the solutions to 8 case studies from the [#8WeekSQLChallenge](https://8weeksqlchallenge.com/). 
 
 It showcases my ability to take on different SQL challenges and demonstrates my proficiency in SQL query writing and problem-solving skills.
 
