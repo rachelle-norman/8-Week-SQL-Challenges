@@ -12,7 +12,7 @@ The solutions to each case study are in the links below.
 
 - [Case Study #1: Danny's Diner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%231:%20Danny's%20Diner.md)
 - [Case Study #2: Pizza Runner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%232:%20Pizza%20Runner.md)
-- [Case Study #3: Foodie-Fi](Link)
+- [Case Study #3: Foodie-Fi](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%233%3A%20Foodie-Fi.md)
 - [Case Study #4: Data Bank](Link)
 - [Case Study #5: Data Mart](Link)
 - [Case Study #6: Clique Bait](Link)
