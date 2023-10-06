@@ -8,7 +8,7 @@
 - [Questions and Solutions](#questions-and-solutions)
 	- [Customer Journey](#customer-journey)
 	- [Data Analysis Questions](#data-analysis-questions)
-  	- [Challenge - Payment Question](#challenge--payment-question)
+  	- [Challenge Payment Question](#challenge-payment-question)
   	- [Outside the Box Questions](#outside-the-box-questions)
 
 All information for this case study has been sourced from the [8-Week SQL Challenge](https://8weeksqlchallenge.com/case-study-3/) website.
@@ -190,7 +190,7 @@ Answer goes here
 
 ***
 
-## Challenge - Payment Question
+## Challenge Payment Question
 
 **#1: The Foodie-Fi team wants you to create a new `payments` table for the year 2020 that includes amounts paid by each customer in the `subscriptions` table with the following requirements:**
   **- Monthly payments always occur on the same day of the month as the original `start_date` of any monthly paid plan**
