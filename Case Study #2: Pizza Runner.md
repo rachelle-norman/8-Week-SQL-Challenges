@@ -5,7 +5,13 @@
 ## 📚 Table of Contents
 - [Objective](#objective)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Data Cleaning and Manipulation](#data-cleaning-and-manipulation)
 - [Questions and Solutions](#questions-and-solutions)
+	- [Pizza Metrics](#pizza-metrics)
+	- [Runner and Customer Experience](#runner-and-customer-experience)
+   	- [Ingredient Optimization](#ingredient-optimization)
+   	- [Pricing and Ratings](#pricing-and-ratings)
+   	- [Bonus DML Challenges](#bonus-dml-challenges)
 
 All information for this case study has been sourced from the [8-Week SQL Challenge](https://8weeksqlchallenge.com/case-study-2/) website.
 
@@ -142,43 +148,95 @@ Here is the updated table:
 
 ***
 
-## Table 3
+## Table: pizza_names
 
-<img src="https://github.com/rachelle-norman/8-Week-SQL-Challenges/assets/129090943/f8dcd5ad-4377-40fc-a07f-f52c012e5836" alt="Image" width="750">
+<img src="https://github.com/rachelle-norman/8-Week-SQL-Challenges/assets/129090943/4d99a83a-eb1f-44d5-b761-72742995626b" alt="Image" width="250">
+<br> </br>
 
+**Issues:** Incorrect spacing
+
+**Actions to Clean:**
+````sql
+UPDATE pizza_names
+SET pizza_name = 'Meat Lovers'
+WHERE pizza_name = 'Meatlovers'
+````
+- Run a quick `UPDATE` statement to correct formatting in the `pizza_name` column.
+
+Here are the changes reflected:
+
+<img src="https://github.com/rachelle-norman/8-Week-SQL-Challenges/assets/129090943/a668d1e8-0fd4-46ae-863e-3e71c16caefc" alt="Image" width="250">
+
+***
 
 ## Questions and Solutions
 
-**#1: What is the total amount each customer spent at the restaurant?**
+## Pizza Metrics
+
+**#1: Question goes here**
 
 ````sql
-SELECT
-	s.customer_id,
-	SUM(m.price) AS total_spent
-FROM
-	sales s
-		JOIN menu m
-			ON s.product_id=m.product_id
-GROUP BY
-	s.customer_id
-ORDER BY
-	s.customer_id
-;
+SQL goes here.
 ````
 #### Steps:
-- Use the `JOIN` clause to merge the `sales` table and the `menu` table on the `product_id` columns in both tables since `s.customer_id` and `m.price` are from the two different tables.
-- Use the `SUM` function on the `m.price` column to calculate the total amount spent per customer.
-- Aggregate the results by the `s.customer_id` and order it by the same column for easier readability.
+- Steps go here
 
 #### Answer:
-| customer_id | total_spent |
-| ----------- | ----------- |
-| A | 76 |
-| B | 74 |
-| C | 36 |
+Answer goes here
+***
 
-- Customer A spent $76.
-- Customer B spent $74.
-- Customer C spent $36.
+## Runner and Customer Experience
 
+**#1: Question goes here**
+
+````sql
+SQL goes here.
+````
+#### Steps:
+- Steps go here
+
+#### Answer:
+Answer goes here
+***
+
+## Ingredient Optimization
+
+**#1: Question goes here**
+
+````sql
+SQL goes here.
+````
+#### Steps:
+- Steps go here
+
+#### Answer:
+Answer goes here
+***
+
+## Pricing and Ratings
+
+**#1: Question goes here**
+
+````sql
+SQL goes here.
+````
+#### Steps:
+- Steps go here
+
+#### Answer:
+Answer goes here
+***
+
+## Bonus DML Challenges
+
+**#1: Question goes here**
+
+````sql
+SQL goes here.
+````
+#### Steps:
+- Steps go here
+
+#### Answer:
+Answer goes here
 ***
