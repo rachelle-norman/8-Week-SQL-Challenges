@@ -10,11 +10,13 @@ All credit goes to [Data With Danny](https://www.linkedin.com/company/datawithda
 
 The solutions to each case study are in the links below.
 
-- [Case Study #1: Danny's Diner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%231:%20Danny's%20Diner.md)
-- [Case Study #2: Pizza Runner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%232:%20Pizza%20Runner.md)
-- [Case Study #3: Foodie-Fi](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%233%3A%20Foodie-Fi.md)
-- [Case Study #4: Data Bank](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%234%3A%20Data%20Bank.md)
-- [Case Study #5: Data Mart](Link)
-- [Case Study #6: Clique Bait](Link)
-- [Case Study #7: Balanced Tree](Link)
-- [Case Study #8: Fresh Segments](Link)
+| Case Study Link | Area of Analysis |
+| --- | --- |
+| [Case Study #1: Danny's Diner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%231:%20Danny's%20Diner.md) | Extract insights to answer questions about customer behavior, menu preferences, loyalty programs |
+| [Case Study #2: Pizza Runner](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%232:%20Pizza%20Runner.md) | Examine various aspects of operations, including item metrics, employee performance, customer experience, pricing, ratings, and potential expansion |
+| [Case Study #3: Foodie-Fi](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%233%3A%20Foodie-Fi.md) | Examine customer onboarding, track subscription trends, compute business metrics, using existing data to create a new table for financial insights, and open-ended technical questions regarding growth, metrics, customer retention, exit surveys, and churn reduction strategies. |
+| [Case Study #4: Data Bank](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%234%3A%20Data%20Bank.md) | Calculate metrics, explore customer behavior, forecast business needs, generate marketing material and a report based on insights from data |
+| [Case Study #5: Data Mart](Link) | |
+| [Case Study #6: Clique Bait](Link) | |
+| [Case Study #7: Balanced Tree](Link) | |
+| [Case Study #8: Fresh Segments](Link) | |
