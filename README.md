@@ -17,6 +17,6 @@ The solutions to each case study are in the links below.
 | [Case Study #3: Foodie-Fi](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%233%3A%20Foodie-Fi.md) | Examine customer onboarding, track subscription trends, compute business metrics, using existing data to create a new table for financial insights, and open-ended technical questions regarding growth, metrics, customer retention, exit surveys, and churn reduction strategies. |
 | [Case Study #4: Data Bank](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%234%3A%20Data%20Bank.md) | Calculate metrics, customer transaction analysis, forecasting to identify business needs, generate marketing material and a report based on insights from data |
 | [Case Study #5: Data Mart](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%235%3A%20Data%20Mart.md) | Data cleaning, data exploration, before-and-after analysis, business area analysis, and strategy development |
-| [Case Study #6: Clique Bait](Link) | |
+| [Case Study #6: Clique Bait](https://github.com/rachelle-norman/8-Week-SQL-Challenges/blob/main/Case%20Study%20%236%3A%20Clique%20Bait.md) | |
 | [Case Study #7: Balanced Tree](Link) | |
 | [Case Study #8: Fresh Segments](Link) | |
