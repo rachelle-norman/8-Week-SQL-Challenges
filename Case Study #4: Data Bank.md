@@ -6,11 +6,11 @@
 - [Objective](#objective)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Questions and Solutions](#questions-and-solutions)
-	- [Customer Nodes Exploration](#customer-nodes)
+	- [Customer Nodes Exploration](#customer-nodes-exploration)
 	- [Customer Transactions](#customer-transactions)
-  - [Data Allocation Challenge](#data-allocation-challenge)
-  - [Extra Challenge](#extra-challenge)
-  - [Extension Request](#extension-request)
+	- [Data Allocation Challenge](#data-allocation-challenge)
+ 	- [Extra Challenge](#extra-challenge)
+  	- [Extension Request](#extension-request)
     
 All information for this case study has been sourced from the [8-Week SQL Challenge](https://8weeksqlchallenge.com/case-study-4/) website.
 
@@ -212,7 +212,7 @@ Answer goes here
 
 ***
 
-## Extra Challenge
+## Extension Request
 
 **The Data Bank team wants a Powerpoint presentation to use as marketing materials for external investors and new prospective customers.**
 
