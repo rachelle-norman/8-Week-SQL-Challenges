@@ -8,8 +8,8 @@
 - [Questions and Solutions](#questions-and-solutions)
 	- [Customer Journey](#customer-journey)
 	- [Data Analysis Questions](#data-analysis-questions)
-  - [Challenge - Payment Question](#challenge-payment-question)
-  - [Outside the Box Questions](#outside-the-box-questions)
+  	- [Challenge - Payment Question](#challenge--payment-question)
+  	- [Outside the Box Questions](#outside-the-box-questions)
 
 All information for this case study has been sourced from the [8-Week SQL Challenge](https://8weeksqlchallenge.com/case-study-3/) website.
 
