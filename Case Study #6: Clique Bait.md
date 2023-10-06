@@ -16,7 +16,7 @@ All information for this case study has been sourced from the [8-Week SQL Challe
 
 ## Objective
 
-Danny launches Data Mart, a new online supermarket that changed to only using sustainable packaging methods from the farm to the customer as of July 2020. Danny needs help quantifying impact of this change on the sales performance of Data Mart and other business areas.
+Danny opens Clique Bait, an online seafood store. Danny needs help analyzing his store's data and calculate funnel fallout rates.
 
 ***
 
