@@ -33,15 +33,15 @@ Danny launches Data Mart, a new online supermarket that changed to only using su
 
 **In a single query, perform the following operations and generate a new table in the `data_mart` schema named `clean_weekly_sales`**
 
-  **- Convert the `week_date` to a `DATE` format**
+- **Convert the `week_date` to a `DATE` format**
 
-  **- Add a `week_number` as the second column for each `week_date` value. Ex: January 1st to January 7th would be 1, January 8th to the 14th would be 2, etc.**
+- **Add a `week_number` as the second column for each `week_date` value. Ex: January 1st to January 7th would be 1, January 8th to the 14th would be 2, etc.**
 
-  **- Add a `month_number` with the calendar month for each `week_date` value as the 3rd column**
+- **Add a `month_number` with the calendar month for each `week_date` value as the 3rd column**
 
-  **- Add a `calendar_year` column as the 4th column containing either 2018, 2019, or 2020 values**
+- **Add a `calendar_year` column as the 4th column containing either 2018, 2019, or 2020 values**
 
-  **- Add a new column called `age_band` after the original `segment` column using the following mapping:**
+- **Add a new column called `age_band` after the original `segment` column using the following mapping:**
   
 | segment | age_band |
 | --- | --- |
@@ -49,16 +49,16 @@ Danny launches Data Mart, a new online supermarket that changed to only using su
 | 2 | Middle Aged |
 | 3 | Retirees |
 
-**- Add a new `demographic` column using the following mapping:**
+- **Add a new `demographic` column using the following mapping:**
 
 | segment | demographic |
 | --- | --- |
 | C | Couples |
 | F | Families |
 
-**- Ensure all `null` string values are changed to an `"unknown"` string value in the original `segment` column as well as the new `age_band` and `demographic` columns.**
+- **Ensure all `null` string values are changed to an `"unknown"` string value in the original `segment` column as well as the new `age_band` and `demographic` columns.**
 
-**- Generate a new `avg_transaction` column rounded to 2 decimal places for each record.**
+- **Generate a new `avg_transaction` column rounded to 2 decimal places for each record.**
 
 
 ````sql
@@ -216,11 +216,11 @@ Answer goes here
 
 **#1. Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?**
 
-  **- `region`**
-  **- `platform`**
-  **- `age_band`**
-  **- `demographic`**
-  **- `customer_type`**
+- **`region`**
+- **`platform`**
+- **`age_band`**
+- **`demographic`**
+- **`customer_type`**
   
 **#2: Do you have any further recommendations for the Data Mart team or any interesting insights based off this analysis?**
 
