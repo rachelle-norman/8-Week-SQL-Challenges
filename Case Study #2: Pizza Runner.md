@@ -30,7 +30,7 @@ Danny launched Pizza Runner, an innovative pizza delivery service inspired by 80
 
 ***
 
-## Data Cleaning & Transformation
+## 🧼 Data Cleaning and Transformation
 
 ## Table: customer_orders
 
@@ -335,18 +335,39 @@ ORDER BY
 | 104 | Meat Lovers | 3 |
 | 105 | Vegetarian | 1 |
 
+Customer 101 and 102 both ordered 2 Meat Lovers and 1 Vegetarian pizza.
+Customer 103 ordered 3 Meat Lovers and 1 Vegetarian pizza.
+Customer 104 ordered 3 Meat Lovers pizzas.
+Customer 105 ordered 1 Vegetarian pizza.
+
 ***
 
 **#6: What was the maximum number of pizzas delivered in a single order?**
 
 ````sql
-SQL goes here.
+SELECT
+	MAX(number_of_pizzas) AS max_number_of_pizzas
+FROM (
+--- subquery to find the amount of pizzas per order ---
+	SELECT
+		c.order_id,
+		COUNT(c.pizza_id) AS number_of_pizzas
+	FROM
+		customer_orders c
+	GROUP BY
+		c.order_id
+	) AS pizza_per_order
+;
 ````
 #### Steps:
-- Steps go here
+- Since it's not possible to nest aggregate functions, use a `MAX` function on a `COUNT` function alias provided in a subquery used to count the number of pizzas per order.
 
 #### Answer:
-Answer goes here
+| max_number_of_pizzas |
+| --- |
+| 3 |
+
+The highest number of pizzas in a single order is 3.
 
 ***
 
