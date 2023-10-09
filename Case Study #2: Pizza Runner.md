@@ -5,7 +5,7 @@
 ## 📚 Table of Contents
 - [Objective](#objective)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
-- [Data Cleaning and Manipulation](#data-cleaning-and-manipulation)
+- [Data Cleaning and Transformation](#data-cleaning-and-transformation)
 - [Questions and Solutions](#questions-and-solutions)
 	- [Pizza Metrics](#pizza-metrics)
 	- [Runner and Customer Experience](#runner-and-customer-experience)
@@ -30,7 +30,7 @@ Danny launched Pizza Runner, an innovative pizza delivery service inspired by 80
 
 ***
 
-## 🧼 Data Cleaning & Transformation
+## Data Cleaning & Transformation
 
 ## Table: customer_orders
 
@@ -176,65 +176,164 @@ Here are the changes reflected:
 **#1: How many pizzas were ordered?**
 
 ````sql
-SQL goes here.
+SELECT
+	COUNT(*) AS number_of_pizzas
+FROM
+	customer_orders
+;
 ````
 #### Steps:
-- Steps go here
+- Run a `COUNT(*)` function on the `customer_orders` table to count how many instances there are.
 
 #### Answer:
-Answer goes here
+| number_of_pizzas |
+| --- |
+| 14 |
+
+There were 14 pizzas ordered total.
 
 ***
 
 **#2: How many unique customer orders were made?**
 
 ````sql
-SQL goes here.
+SELECT
+	COUNT(DISTINCT c.order_id) AS number_of_orders
+FROM
+	customer_orders c
+;
 ````
 #### Steps:
-- Steps go here
+- Run a `COUNT (DISTINCT)` function on the `c.order_id` column in the `customer_orders` table to count only unique order IDs and not any duplicates.
 
 #### Answer:
-Answer goes here
+
+| number_of_orders |
+| --- |
+| 10 |
+
+There were 10 unique customer orders made.
 
 ***
 
 **#3: How many successful orders were delivered by each runner?**
 
 ````sql
-SQL goes here.
+SELECT
+	r.runner_id,
+	COUNT(r.order_id) AS number_of_orders
+FROM
+	runner_orders r
+WHERE
+	pickup_time IS NOT null
+GROUP BY
+	r.runner_id
+ORDER BY
+	r.runner_id
+;
 ````
 #### Steps:
-- Steps go here
+- Run a `COUNT` function on the `r.order_id` column in the `runner_orders` table to count how many orders were made by the runners
+- Filter the results where the `r.pickup_time` isn't `NULL` as this indicates an order cancellation.
+- Group the results by the `r.runner_id` to aggregate the number of orders for each runner.
+- Order the results by the `r.runner_id` for easier readability.
 
 #### Answer:
-Answer goes here
+
+| runner_id | number_of_orders |
+| --- | --- |
+| 1 | 4 |
+| 2 | 3 |
+| 3 | 1 |
+
+Runner 1 delivered 4 orders.
+Runner 2 delivered 3 orders.
+Runner 3 delivered 1 order.
 
 ***
 
 **#4: How many of each type of pizza was delivered?**
 
 ````sql
-SQL goes here.
+WITH delivered_orders AS (
+		SELECT 
+			r.order_id
+		FROM 
+			runner_orders r
+		WHERE
+			r.pickup_time IS NOT NULL
+)
+
+--- end of cte ---
+
+SELECT
+	p.pizza_name,
+	COUNT(c.pizza_id) AS delivered_count
+FROM
+	pizza_names p
+		JOIN customer_orders c
+			ON p.pizza_id=c.pizza_id
+		JOIN delivered_orders d
+			ON c.order_id=d.order_id
+GROUP BY
+	p.pizza_name
+ORDER BY
+	p.pizza_name
+;
 ````
 #### Steps:
-- Steps go here
+- Create a CTE that stores the order IDs of all orders that were delivered by using the `r.pickup_time` to filter out any cancelled orders.
+- Run a `COUNT` function to find the number of each type of pizza that was ordered.
+- Use a `JOIN` clause to combine the `pizza_names` table to the `customers` table to retrieve the pizza name for each pizza ID.
+- Use a 2nd `JOIN` to further combine the tables with the CTE to only show results if the order was actually delivered.
+- Group and order the results by the `p.pizza_name`.
 
 #### Answer:
-Answer goes here
+
+| pizza_name | delivered_count |
+| --- | --- |
+| Meat Lovers | 9 |
+| Vegetarian | 3 |
+
+
+The Meat Lovers pizza was delivered 9 times.
+The Vegetarian pizza was delivered 3 times.
 
 ***
 
 **#5: How many Vegetarian and Meat Lovers were ordered by each customer?**
 
 ````sql
-SQL goes here.
+SELECT
+	c.customer_id,
+	p.pizza_name,
+	COUNT(c.pizza_id) AS order_count
+FROM
+	customer_orders c
+		JOIN pizza_names p
+			ON c.pizza_id=p.pizza_id
+GROUP BY
+	c.customer_id,
+	p.pizza_name
+ORDER BY 
+	c.customer_id
+;
 ````
 #### Steps:
-- Steps go here
-
+- Use a `COUNT` function to count the number of pizzas ordered.
+- Use a `JOIN` clause on the `customer_orders` table and the `pizza_names` table to retrieve the names of the pizzas. 
+- Group the results by the `c.customer_id` and `p.pizza_name` columns and order them by the `c.customer_id`.
+  
 #### Answer:
-Answer goes here
+| customer_id | pizza_name | order_count |
+| 101 | Meat Lovers | 2 |
+| 101 | Vegetarian | 1 |
+| 102 | Meat Lovers | 2 |
+| 102 | Vegetarian | 1 |
+| 103 | Meat Lovers | 3 |
+| 103 | Vegetarian | 1 |
+| 104 | Meat Lovers | 3 |
+| 105 | Vegetarian | 1 |
 
 ***
 
