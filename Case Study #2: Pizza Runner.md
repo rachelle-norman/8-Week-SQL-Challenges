@@ -47,19 +47,19 @@ FROM
 	customer_orders;
 
 UPDATE customer_orders
-SET extras = ' '
+SET extras = ''
 WHERE extras IS NULL
 	OR extras = 'null'
 ;
 
 UPDATE customer_orders
-SET exclusions = ' '
+SET exclusions = ''
 WHERE exclusions IS NULL
 	OR exclusions = 'null'
 ;
 ````
 - Run a `SELECT *` statement to select all columns from the tables to see the data and the data types to identify where the issues in the table lie.
-- Since the data type for both the `exclusions` and `extras` tables is 'VARCHAR(4)`, update the null values to ' ' since it's also a string.
+- Since the data type for both the `exclusions` and `extras` tables is 'VARCHAR(4)`, update the null values to blank values.
 - Highlight and run the `SELECT *` statement again after running the `UPDATE` statements to ensure the data accurately reflects the changes.
 
 Here is the updated table:
