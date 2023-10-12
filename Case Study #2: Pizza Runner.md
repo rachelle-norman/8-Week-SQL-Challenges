@@ -246,9 +246,9 @@ ORDER BY
 | 2 | 3 |
 | 3 | 1 |
 
-Runner 1 delivered 4 orders.
-Runner 2 delivered 3 orders.
-Runner 3 delivered 1 order.
+- Runner 1 delivered 4 orders. 
+- Runner 2 delivered 3 orders.
+- Runner 3 delivered 1 order.
 
 ***
 
@@ -296,8 +296,8 @@ ORDER BY
 | Vegetarian | 3 |
 
 
-The Meat Lovers pizza was delivered 9 times.
-The Vegetarian pizza was delivered 3 times.
+- The Meat Lovers pizza was delivered 9 times.
+- The Vegetarian pizza was delivered 3 times.
 
 ***
 
@@ -326,6 +326,7 @@ ORDER BY
   
 #### Answer:
 | customer_id | pizza_name | order_count |
+| --- | --- | --- |
 | 101 | Meat Lovers | 2 |
 | 101 | Vegetarian | 1 |
 | 102 | Meat Lovers | 2 |
@@ -335,10 +336,10 @@ ORDER BY
 | 104 | Meat Lovers | 3 |
 | 105 | Vegetarian | 1 |
 
-Customer 101 and 102 both ordered 2 Meat Lovers and 1 Vegetarian pizza.
-Customer 103 ordered 3 Meat Lovers and 1 Vegetarian pizza.
-Customer 104 ordered 3 Meat Lovers pizzas.
-Customer 105 ordered 1 Vegetarian pizza.
+- Customer 101 and 102 both ordered 2 Meat Lovers and 1 Vegetarian pizza.
+- Customer 103 ordered 3 Meat Lovers and 1 Vegetarian pizza.
+- Customer 104 ordered 3 Meat Lovers pizzas.
+- Customer 105 ordered 1 Vegetarian pizza.
 
 ***
 
@@ -374,13 +375,71 @@ The highest number of pizzas in a single order is 3.
 **#7: For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
 
 ````sql
-SQL goes here.
+WITH delivered_orders AS (
+	SELECT
+		r.order_id
+	FROM
+		runner_orders r
+	WHERE
+		r.pickup_time IS NOT NULL
+),
+
+--- end of cte
+
+pizza_numbers_per_cust AS (
+	SELECT 
+		c.customer_id,
+		SUM(
+			CASE
+				WHEN length(c.exclusions) != 0 OR length(c.extras) != 0 THEN 1
+				ELSE 0
+				END) AS modded_pizza_count,
+	
+		SUM(
+			CASE
+				WHEN length(c.exclusions) = 0 AND length(c.extras) = 0 THEN 1
+				ELSE 0
+				END) AS original_pizza_count
+	
+	FROM
+		customer_orders c
+			JOIN delivered_orders d
+				ON c.order_id=d.order_id
+	GROUP BY
+		c.customer_id
+
+)
+
+--- end of cte ---
+
+SELECT
+	p.customer_id,
+	p.modded_pizza_count,
+	p.original_pizza_count
+FROM
+	pizza_numbers_per_cust p
+GROUP BY
+	p.customer_id,
+	p.modded_pizza_count,
+	p.original_pizza_count
+ORDER BY
+	p.customer_id
 ````
 #### Steps:
-- Steps go here
-
+- Create a CTE selecting all order IDs from the `r.runner_orders` table since this table holds the data to tell us whether or not an order was actually delivered.
+- Create a second CTE using `SUM` with `CASE WHEN` to count two categories: modified pizzas with values in the `exclusions` or `extras` columns and original pizzas with no modifications.
+- Group the results by `customer_id` to obtain the count for each customer in both categories.
+- `JOIN` the `delivered_orders` CTE to the `pizza_numbers_per_cust`
+- In the main query, select all of the newly-created columns from the 2nd CTE to display the final answer.
+  
 #### Answer:
-Answer goes here
+| customer_id | modded_pizza_count | original_pizza_count |
+| --- | --- | --- |
+| 101 | 0 | 2 |
+| 102 | 0 | 3 |
+| 103 | 3 | 0 |
+| 104 | 2 | 1 |
+| 105 | 1 | 0 |
 
 ***
 
