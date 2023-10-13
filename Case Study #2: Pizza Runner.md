@@ -429,7 +429,7 @@ ORDER BY
 - Create a CTE selecting all order IDs from the `r.runner_orders` table since this table holds the data to tell us whether or not an order was actually delivered.
 - Create a second CTE using `SUM` with `CASE WHEN` to count two categories: modified pizzas with values in the `exclusions` or `extras` columns and original pizzas with no modifications.
 - Group the results by `customer_id` to obtain the count for each customer in both categories.
-- `JOIN` the `delivered_orders` CTE to the `pizza_numbers_per_cust`
+- `JOIN` the `delivered_orders` CTE to the `pizza_numbers_per_cust` to only look at data from orders that were fulfilled.
 - In the main query, select all of the newly-created columns from the 2nd CTE to display the final answer.
   
 #### Answer:
@@ -441,59 +441,146 @@ ORDER BY
 | 104 | 2 | 1 |
 | 105 | 1 | 0 |
 
+- Customer 101 ordered 2 pizzas without any modifications.
+- Customer 102 ordered 3 pizzas without any modifications.
+- Customer 103 ordered 3 pizzas with at least 1 change.
+- Customer 104 ordered 2 pizzas with at least 1 change and 1 pizza without any modifications.
+- Customer 105 ordered 1 pizza with at least 1 change.
+
 ***
 
 **#8: How many pizzas were delivered that had both exclusions and extras?**
 
 ````sql
-SQL goes here.
+WITH delivered_orders AS (
+	SELECT
+		r.order_id
+	FROM
+		runner_orders r
+	WHERE
+		r.pickup_time IS NOT NULL
+)
+
+--- end of cte
+
+SELECT
+	SUM(CASE
+		WHEN length(c.exclusions) != 0 AND length(c.extras) != 0 THEN 1
+		ELSE 0
+	END) AS pizzas_w_both_changes
+		
+FROM
+	customer_orders c
+		JOIN delivered_orders d
+			ON c.order_id=d.order_id
 ````
 #### Steps:
-- Steps go here
+- - Create a CTE selecting all order IDs from the `r.runner_orders` table since this table holds the data to tell us whether or not an order was actually delivered.
+- In the main query, use a `SUM` function in conjunction with a `CASE WHEN` statement to count how many pizzas had values in both the `exclusions` and the `extras` columns. 
+- `JOIN` the `delivered_orders` CTE to the `pizza_numbers` to only look at data from orders that were fulfilled.
 
 #### Answer:
-Answer goes here
+| pizzas_w_both_changes |
+| --- |
+| 1 |
 
 ***
 
 **#9: What was the total volume of pizzas ordered for each hour of the day?**
 
 ````sql
-SQL goes here.
+SELECT
+	DATE_PART('hour', c.order_time) AS hour,
+	COUNT(c.order_id) AS hourly_count
+FROM
+	customer_orders c
+GROUP BY
+	hour
+ORDER BY
+	hour
 ````
 #### Steps:
-- Steps go here
+- Use a `DATE_PART` function to extract the hour out of the `order_time` column.
+- Use a `COUNT` function to count the number of orders.
+- Group the results by hour to get an hourly order count.
 
 #### Answer:
-Answer goes here
+| hour | hourly_order_count|
+| --- | --- |
+| 11 | 1 |
+| 13 | 3 |
+| 18 | 3 |
+| 19 | 1 |
+| 21 | 3 |
+| 23 | 3 | 
+
+1pm, 6pm, 9pm, and 11pm all had 3 pizzas ordered during that hour while 11am and 7pm only had 1 pizza ordered during each hour.
 
 ***
 
 **#10: What was the volume of orders for each day of the week?**
 
 ````sql
-SQL goes here.
+SELECT
+	TO_CHAR(c.order_time, 'Day') AS day_of_week,
+	COUNT(c.order_id) AS pizzas_ordered
+FROM
+	customer_orders c
+GROUP BY
+	day_of_week
 ````
 #### Steps:
-- Steps go here
+- Extract the name of the day of the week by using the `TO_CHAR` function on the `c.order_time` column.
+- Use a `COUNT` function on the `c.order_id` column to count the number of orders.
+- Group the results by day of the week.
 
 #### Answer:
-Answer goes here
+
+| day_of_week | pizzas_ordered |
+| --- | --- |
+| Wednesday | 5 |
+| Thursday | 3 |
+| Friday | 1 |
+| Saturday | 5 |
+
+- 5 pizzas were ordered on a Wednesday and a Saturday each.
+- 3 pizzas were ordered on a Thursday.
+- Only 1 pizza was ordered on a Friday.
 
 ***
 
 ## Runner and Customer Experience
 
-**#1: How many runners signed up for each 1 week period? (i.e. week starts `2021-01-01`**
+**#1: How many runners signed up for each 1 week period? (i.e. week starts `2021-01-01`)**
 
 ````sql
-SQL goes here.
+SELECT
+    ROUND(
+	(EXTRACT(DOY FROM r.registration_date) - EXTRACT(DOY FROM '2021-01-01'::date)) / 7 + 1,0) AS week_number,
+    COUNT(r.runner_id) AS runner_registrations
+FROM
+    runners r
+GROUP BY
+    week_number
+ORDER BY
+	week_number
 ````
 #### Steps:
-- Steps go here
+
+**Note: Initially I was going to just use a DATE_PART function but it returned 53 in the `week_number` column instead of 1 for `2021-01-01` so I had to find a work around to get thet data returned how I wanted it.**
+
+- Extract the day of the year (DOY) from the `r.registration_date` column and from `2021-01-01` and subtract it from the `r.registration_date` DOY to find the difference between the two. - Divide the equation by 7 and add 1 to calculate what week the `r.registration_date` falls in and round it up to the closest whole number. 
+- Use a `COUNT` function on the `r.runner_id` column to find how many runners signed up.
+- `GROUP` the results by the `week_number` created in the `ROUND` function.
 
 #### Answer:
-Answer goes here
+| week_number | runner_registrations |
+| --- | --- |
+| 1 | 2 |
+| 2 | 1 |
+| 3 | 1 |
+
+Week 1 had 2 registrations while Week 2 and Week 3 both had 1 registration each.
 
 ***
 
