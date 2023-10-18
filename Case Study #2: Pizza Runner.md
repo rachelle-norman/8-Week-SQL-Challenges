@@ -424,6 +424,7 @@ GROUP BY
 	p.original_pizza_count
 ORDER BY
 	p.customer_id
+;
 ````
 #### Steps:
 - Create a CTE selecting all order IDs from the `r.runner_orders` table since this table holds the data to tell us whether or not an order was actually delivered.
@@ -473,6 +474,7 @@ FROM
 	customer_orders c
 		JOIN delivered_orders d
 			ON c.order_id=d.order_id
+;
 ````
 #### Steps:
 - - Create a CTE selecting all order IDs from the `r.runner_orders` table since this table holds the data to tell us whether or not an order was actually delivered.
@@ -498,6 +500,7 @@ GROUP BY
 	hour
 ORDER BY
 	hour
+;
 ````
 #### Steps:
 - Use a `DATE_PART` function to extract the hour out of the `order_time` column.
@@ -528,6 +531,7 @@ FROM
 	customer_orders c
 GROUP BY
 	day_of_week
+;
 ````
 #### Steps:
 - Extract the name of the day of the week by using the `TO_CHAR` function on the `c.order_time` column.
@@ -564,12 +568,14 @@ GROUP BY
     week_number
 ORDER BY
 	week_number
+;
 ````
 #### Steps:
 
 **Note: Initially I was going to just use a DATE_PART function but it returned 53 in the `week_number` column instead of 1 for `2021-01-01` so I had to find a work around to get thet data returned how I wanted it.**
 
-- Extract the day of the year (DOY) from the `r.registration_date` column and from `2021-01-01` and subtract it from the `r.registration_date` DOY to find the difference between the two. - Divide the equation by 7 and add 1 to calculate what week the `r.registration_date` falls in and round it up to the closest whole number. 
+- Extract the day of the year (DOY) from the `r.registration_date` column and from `2021-01-01` and subtract it from the `r.registration_date` DOY to find the difference between the two.
+- Divide the equation by 7 and add 1 to calculate what week the `r.registration_date` falls in and round it up to the closest whole number. 
 - Use a `COUNT` function on the `r.runner_id` column to find how many runners signed up.
 - `GROUP` the results by the `week_number` created in the `ROUND` function.
 
@@ -587,78 +593,189 @@ Week 1 had 2 registrations while Week 2 and Week 3 both had 1 registration each.
 **#2: What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
 
 ````sql
-SQL goes here.
+SELECT
+	r.runner_id,
+	ROUND(AVG(EXTRACT(MINUTE FROM (r.pickup_time-c.order_time, 0)))) AS avg_arrival_time_in_mins
+FROM
+	runner_orders r
+		JOIN customer_orders c
+			ON r.order_id=c.order_id
+WHERE
+	r.pickup_time IS NOT NULL
+GROUP BY
+	r.runner_id
+ORDER BY
+	r.runner_id
+;
 ````
 #### Steps:
-- Steps go here
+- Write a function to find the difference between the `c.order_time` and the `r.pickup_time` in minutes and the average of the time differences, rounded to the nearest whole number.
+- Use a `JOIN` clause to join the `customer_orders` table with the `runner_orders` table.
+- Filter the results to remove any cancelled orders and group and order the data by the `r.runner_id` to get the average arrival time per runner.
 
 #### Answer:
-Answer goes here
+| runner_id | avg_arrival_time_in_mins |
+| --- | --- |
+| 1 | 15 |
+| 2 | 23 |
+| 3 | 10 |
+
+- Runner 1's average arrival time was 15 minutes.
+- Runner 2's average arrival time was 23 minutes.
+- Runner 3's average arrival time was 10 minutes.
 
 ***
 
 **#3: Is there any relationship between the number of pizzas and how long the order takes to prepare?**
 
 ````sql
-SQL goes here.
+WITH order_info AS (
+	SELECT
+		c.order_id,
+		COUNT(c.pizza_id) AS pizza_count,
+		ROUND(MAX(EXTRACT(MINUTE FROM (r.pickup_time-c.order_time))),0) AS preparation_time
+	FROM
+		runner_orders r
+			JOIN customer_orders c
+				ON r.order_id=c.order_id
+	WHERE
+		r.pickup_time IS NOT NULL
+	GROUP BY
+		c.order_id
+	ORDER BY
+		c.order_id
+)
+
+--- end of cte ---
+
+SELECT
+	CORR(o.pizza_count, o.preparation_time) AS correlation_coefficient
+FROM
+	order_info o
+;
 ````
 #### Steps:
-- Steps go here
+- Create a CTE finding the amount of pizzas and preparation time per order that was fulfilled.
+- Use a `CORR` function to find the correlation coefficient to find the strength of the linear relationship between the two values, where -1 is a perfect negative correlation, 1 is a perfect positive correlation, and 0 is no correlation.
 
 #### Answer:
-Answer goes here
+| correlation_coefficient |
+| --- |
+| 0.83725... |
+
+Since the correlation coefficient is relatively close to 1, we can say with high confidence that the higher the number of pizzas there are per order, the longer the preparation time.
 
 ***
 
 **#4: What was the average distance travelled for each customer?**
 
 ````sql
-SQL goes here.
+SELECT
+	c.customer_id,
+	ROUND(AVG(r.distance)) AS avg_distance
+FROM
+	runner_orders r
+		JOIN customer_orders c
+			ON r.order_id=c.order_id
+WHERE
+	r.pickup_time IS NOT NULL
+GROUP BY
+	c.customer_id
+ORDER BY
+	c.customer_id
+;
 ````
 #### Steps:
-- Steps go here
+- Run the `AVG` function on the `r.distance` column to find the average distance.
+- Use a `JOIN` clause to join the `customer_orders` table to the `runner_orders` table to pull the `c.customer_id`.
+- Filter out orders that were cancelled and group and order the results by the `c.customer_id`.
 
 #### Answer:
-Answer goes here
+| customer_id | avg_distance |
+| 101 | 20 |
+| 102 | 17 |
+| 103 | 23 |
+| 104 | 10 |
+| 105 | 25 |
+
+- Customer 101, 102, 104 all live 20km or less from Pizza Runner, while only Customer 103 and 105 live more than 20km away.
+- This could be useful in trying to establish a radius for marketing campaigns/ads.
 
 ***
 
 **#5: What was  the difference between the longest and shortest delivery times for all orders?**
 
 ````sql
-SQL goes here.
+SELECT
+	MAX(r.duration)- MIN(r.duration) AS time_difference
+FROM
+	runner_orders r
+WHERE 
+	r.pickup_time IS NOT NULL
+;
 ````
 #### Steps:
-- Steps go here
+- Subtract the lowest duration time from the highest duration time to find the time difference between delivery times for all orders.
+- Filter out all orders that were cancelled.
 
 #### Answer:
-Answer goes here
+| time_difference |
+| 30 |
+
+The time difference between the longest and shortest delivery times is 30 minutes.
 
 ***
 
 **#6: What was the average speed for each runner for each delivery and do you notice any trend for these values?**
 
 ````sql
-SQL goes here.
+WITH runner_speed AS (
+	SELECT
+		r.runner_id,
+		r.order_id,
+		MAX(r.distance/r.duration*60)::numeric AS speed
+	FROM
+		runner_orders r
+	WHERE
+		r.pickup_time IS NOT NULL
+	GROUP BY
+		r.runner_id,
+		r.order_id
+)
+
+--- end of cte ---
+
+SELECT
+	r.runner_id,
+	r.order_id,
+	ROUND(AVG(speed), 1) AS avg_speed_in_kmh
+FROM
+	runner_speed r
+GROUP BY
+	r.runner_id,
+	r.order_id
+ORDER BY
+	r.runner_id,
+	r.order_id
 ````
 #### Steps:
-- Steps go here
+- Create a CTE to find the rate of speed by dividing the `r.distance` by the `r.duration` after multiplying the duration by 60 to convert the time from minutes to hours for all completed orders and cast the answer as the `numeric` data type.
+- In the main query, select the `r.runner_id`, `r.order_id`, and then round the calculated average of the new `r.speed` column of the CTE.
+- Group and order the results by the `r.runner_id` and `r.order_id`.
 
 #### Answer:
-Answer goes here
+| runner_id | order_id | avg_speed_in_kmh |
+| --- | --- | --- |
+| 1 | 1 | 37.5 |
+| 1 | 2 | 44.4 |
+| 1 | 3 | 40.2 |
+| 1 | 10 | 60.0 |
+| 2 | 4 | 35.1 |
+| 2 | 7 | 60.0 |
+| 2 | 8 | 93.6 |
+| 3 | 5 | 40.0 |
 
-***
-
-**#7: What is the successful delivery percentage for each runner?**
-
-````sql
-SQL goes here.
-````
-#### Steps:
-- Steps go here
-
-#### Answer:
-Answer goes here
+There's not exactly a large enough result set to be able to confidently point out any trends, however from this limited result set, you can see that Runner 2 has very inconsistent delivery times, with one being an especially slow delivery time.
 
 ***
 
