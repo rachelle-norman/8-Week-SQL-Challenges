@@ -784,39 +784,97 @@ There's not exactly a large enough result set to be able to confidently point ou
 **#1: What are the standard ingredients for each pizza?**
 
 ````sql
-SQL goes here.
+SELECT
+	pn.pizza_name AS pizza_name,
+	string_agg(pt.topping_name, ', ' ORDER BY pt.topping_id) AS toppings
+FROM 
+	pizza_names pn
+		JOIN pizza_recipes pr
+			ON pn.pizza_id = pr.pizza_id
+		JOIN pizza_toppings pt
+			ON pt.topping_id = ANY(STRING_TO_ARRAY(pr.toppings, ', ')::integer[])
+GROUP BY
+	pn.pizza_name
+ORDER BY
+	pn.pizza_name
+;
 ````
 #### Steps:
-- Steps go here
+- Select the names of the pizza and the names of the toppings.
+- Use a `JOIN` clause to merge the `pizza_names` table and the `pizza_recipes` tables to retrieve the list of topping IDs for each pizza.
+- Use another `JOIN` clause to further merge the table with the `pizza_toppings` table to retrieve the topping name for each topping ID.
+- Group and order the results by the `pizza_name` column.
 
 #### Answer:
-Answer goes here
+| pizza_name | toppings |
+| --- | --- |
+| Meat Lovers | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
+| Vegetarian | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce |
+
+- The Meat Lovers pizza has bacon, BBQ sauce, beef, cheese, chicken, mushrooms, pepperoni, and salami on it.
+- The Vegetarian pizza has cheese, mushrooms, onions, peppers, tomatoes, and tomato sauce on it.
 
 ***
 
 **#2: What was the most commonly added extra?**
 
 ````sql
-SQL goes here.
+SELECT
+    pt.topping_name,
+    COUNT(*) AS topping_count
+FROM
+    customer_orders c
+    	JOIN LATERAL unnest(string_to_array(c.extras, ', ')::text[]) AS t(topping_id) 
+		ON TRUE
+    	JOIN pizza_toppings pt 
+		ON t.topping_id::integer = pt.topping_id
+GROUP BY
+    pt.topping_name
+ORDER BY
+    topping_count DESC
+LIMIT 1;
 ````
 #### Steps:
-- Steps go here
+- Select topping name and the counts of how many times each topping occurs in the `extras` column.
+- Use a `JOIN` clause to merge the `customer_orders` table to the new table `t` created by separating all of the topping IDs in the `extras` column into their own rows.
+- Use another `JOIN` clause to further merge the table with the `pizza_toppings` table to retrieve the names of each topping ID.
+- Group the results by the topping name and order the results by the topping count descending and set the limit to 1, effectively only showing the topping with the most occurrences.
 
 #### Answer:
-Answer goes here
+| topping_name | topping_count |
+| --- | --- |
+| Bacon | 4 |
 
 ***
 
 **#3: What was the most common exclusion?**
 
 ````sql
-SQL goes here.
+SELECT
+    pt.topping_name,
+    COUNT(*) AS topping_count
+FROM
+    customer_orders c
+    	JOIN LATERAL unnest(string_to_array(c.exclusions, ', ')::text[]) AS t(topping_id) 
+			ON TRUE
+    	JOIN pizza_toppings pt 
+			ON t.topping_id::integer = pt.topping_id
+GROUP BY
+    pt.topping_name
+ORDER BY
+    topping_count DESC
+LIMIT 1;
 ````
 #### Steps:
-- Steps go here
+- - Select topping name and the counts of how many times each topping occurs in the `exclusions` column.
+- Use a `JOIN` clause to merge the `customer_orders` table to the new table `t` created by separating all of the topping IDs in the `exclusions` column into their own rows.
+- Use another `JOIN` clause to further merge the table with the `pizza_toppings` table to retrieve the names of each topping ID.
+- Group the results by the topping name and order the results by the topping count descending and set the limit to 1, effectively only showing the topping with the most occurrences.
 
 #### Answer:
-Answer goes here
+| topping_name | topping_count |
+| --- | --- |
+| Cheese | 4 |
 
 ***
 
